@@ -1,2 +1,5 @@
 #!/bin/sh
-dmenu_path | dmenu "$@" | ${SHELL:-"/bin/sh"} &
+CMD=$(dmenu_path|dmenu "$@" -l 11)
+# CMD="dmenu_kill"
+echo $CMD
+zsh -c "$CMD"
