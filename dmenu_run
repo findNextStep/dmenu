@@ -1,4 +1,4 @@
 #!/bin/sh
-CMD=$(dmenu_path|dmenu "$@" -l 11)
+CMD=$(dmenu_path|dmenu "$@" )
 sleep 0.3
 zsh -c "$CMD"

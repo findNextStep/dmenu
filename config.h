@@ -15,7 +15,7 @@ static const char *colors[SchemeLast][2] = {
 	[SchemeFront] = {"#000000", "#0000ff" }
 };
 /* -l option; if nonzero, dmenu uses vertical list with given number of lines */
-static unsigned int lines      = 0;
+static unsigned int lines      = 11;
 
 /*
  * Characters not considered part of a word while deleting words
