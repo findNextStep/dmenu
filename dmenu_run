@@ -1,5 +1,4 @@
 #!/bin/sh
 CMD=$(dmenu_path|dmenu "$@" -l 11)
-# CMD="dmenu_kill"
-echo $CMD
+sleep 0.3
 zsh -c "$CMD"
