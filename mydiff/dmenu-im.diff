@@ -1,0 +1,28 @@
+--- dmenu-4.6/dmenu.c	2015-11-09 06:42:21.000000000 +0800
++++ dmenu.c	2016-05-08 17:05:02.314924000 +0800
+@@ -495,7 +495,7 @@
+ 	XEvent ev;
+ 
+ 	while (!XNextEvent(dpy, &ev)) {
+-		if (XFilterEvent(&ev, win))
++		if (XFilterEvent(&ev, None))
+ 			continue;
+ 		switch(ev.type) {
+ 		case Expose:
+@@ -601,6 +601,7 @@
+ 	                XNClientWindow, win, XNFocusWindow, win, NULL);
+ 
+ 	XMapRaised(dpy, win);
++	XSetInputFocus(dpy, win, RevertToParent, CurrentTime);
+ 	drw_resize(drw, mw, mh);
+ 	drawmenu();
+ }
+@@ -654,6 +655,8 @@
+ 
+ 	if (!setlocale(LC_CTYPE, "") || !XSupportsLocale())
+ 		fputs("warning: no locale support\n", stderr);
++	if (!XSetLocaleModifiers(""))
++		fputs("warning: no locale modifiers support\n", stderr);
+ 	if (!(dpy = XOpenDisplay(NULL)))
+ 		die("cannot open display\n");
+ 	screen = DefaultScreen(dpy);
