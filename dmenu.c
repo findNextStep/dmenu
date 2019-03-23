@@ -294,6 +294,19 @@ compare_distance(const void *a, const void *b)
 	return da->distance - db->distance;
 }
 
+static int char_match(char a,char b){
+    if (a == b){
+        return True;
+    }else{
+        if (a >= 'a' && a <'z'){
+            if (b - a == 'A' - 'a'){
+                return True;
+            }
+        }
+        return False;
+    }
+}
+
 static void
 fuzzymatch(void)
 {
@@ -314,7 +327,7 @@ fuzzymatch(void)
 			/* walk through item text */
 			for (i = 0; i < itext_len && (c = item->text[i]); i++) {
 				/* fuzzy match pattern */
-				if (text[pidx] == c) {
+                if (char_match(text[pidx],c)){
 					if (sidx == -1)
 						sidx = i;
 					pidx++;
