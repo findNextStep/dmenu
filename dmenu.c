@@ -26,7 +26,7 @@
 #define TEXTW(X)              (drw_fontset_getwidth(drw, (X)) + lrpad)
 
 /* enums */
-enum { SchemeNorm,SchemeFront ,SchemeSel, SchemeOut, SchemeLast }; /* color schemes */
+enum { SchemeNorm,SchemeFront ,SchemeSel, SchemeOut,SchemeNerd, SchemeLast}; /* color schemes */
 
 struct item {
 	char *text;
@@ -155,7 +155,9 @@ drawmenu(void)
 
 	if (prompt && *prompt) {
 		drw_setscheme(drw, scheme[SchemeFront]);
-		x = drw_text(drw, x, 0, promptw, bh, lrpad / 2, prompt, 0);
+		x = drw_text(drw, x, 0, promptw - 6, bh, 0, prompt, 0);
+		drw_setscheme(drw, scheme[SchemeNerd]);
+		x = drw_text(drw, x- 12, 0, TEXTW("") - 12 , bh, 0, "", 0);
 	}
 	/* draw input field */
 	w = (lines > 0 || !matches) ? mw - x : inputw;
