@@ -329,6 +329,11 @@ fuzzymatch(void)
 			/* walk through item text */
 			for (i = 0; i < itext_len && (c = item->text[i]); i++) {
 				/* fuzzy match pattern */
+                if (pidx == 1){
+                    if (char_match(text[pidx - 1],c)){
+                        sidx = i;
+                    }
+                }
                 if (char_match(text[pidx],c)){
 					if (sidx == -1)
 						sidx = i;
@@ -344,7 +349,7 @@ fuzzymatch(void)
 				/* compute distance */
 				/* factor in 30% of sidx and distance between eidx and total
 				 * text length .. let's see how it works */
-				item->distance = eidx - sidx + (itext_len - eidx + sidx) / 3;
+				item->distance = (eidx - sidx) ;//+ (itext_len - eidx + sidx) / 3;
 				appenditem(item, &matches, &matchend);
 				number_of_matches++;
 			}
