@@ -309,6 +309,36 @@ static int char_match(char a,char b){
     }
 }
 
+inline int min_int(int i,int j){
+    return i < j ? i : j;
+}
+
+int lev_cal(const char * text,const int text_len,const char *match_text,const int match_len,int i){
+    int pidx = 1,eidx=-1;
+    if (i > text_len - match_len){
+        return text_len * 1002;
+    }
+    if (text[i] != match_text[0]){
+        return lev_cal(text,text_len,match_text,match_len,i+1);
+    }else{
+        const int i_orig = i;
+        for (;i < text_len;i++) {
+            /* fuzzy match pattern */
+            if (char_match(text[i],match_text[pidx])){
+                pidx++;
+                if (pidx == match_len) {
+                    eidx = i;
+                    break;
+                }
+            }
+        }
+        if (eidx == -1){
+            return lev_cal(text,text_len,match_text,match_len,i_orig + 1);
+        }
+        return min_int((eidx - i_orig) * 1000 + i_orig,lev_cal(text,text_len,match_text,match_len,i_orig + 1));
+    }
+}
+
 static void
 fuzzymatch(void)
 {
@@ -329,11 +359,11 @@ fuzzymatch(void)
 			/* walk through item text */
 			for (i = 0; i < itext_len && (c = item->text[i]); i++) {
 				/* fuzzy match pattern */
-                if (pidx == 1){
-                    if (char_match(text[pidx - 1],c)){
-                        sidx = i;
-                    }
-                }
+                // if (pidx == 1){
+                    // if (char_match(text[pidx - 1],c)){
+                        // sidx = i;
+                    // }
+                // }
                 if (char_match(text[pidx],c)){
 					if (sidx == -1)
 						sidx = i;
@@ -349,7 +379,9 @@ fuzzymatch(void)
 				/* compute distance */
 				/* factor in 30% of sidx and distance between eidx and total
 				 * text length .. let's see how it works */
-				item->distance = (eidx - sidx) ;//+ (itext_len - eidx + sidx) / 3;
+				/* item->distance = (eidx - sidx) ;//+ (itext_len - eidx + sidx) / 3; */
+                item->distance = lev_cal(item->text,itext_len,
+                        text,text_len,0);
 				appenditem(item, &matches, &matchend);
 				number_of_matches++;
 			}
