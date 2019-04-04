@@ -349,7 +349,6 @@ fuzzymatch(void)
 	int text_len = strlen(text), itext_len;
 
 	matches = matchend = NULL;
-
 	/* walk through all items */
 	for (item = items; item && item->text; item++) {
 		if (text_len) {
@@ -359,11 +358,6 @@ fuzzymatch(void)
 			/* walk through item text */
 			for (i = 0; i < itext_len && (c = item->text[i]); i++) {
 				/* fuzzy match pattern */
-                // if (pidx == 1){
-                    // if (char_match(text[pidx - 1],c)){
-                        // sidx = i;
-                    // }
-                // }
                 if (char_match(text[pidx],c)){
 					if (sidx == -1)
 						sidx = i;
@@ -401,9 +395,9 @@ fuzzymatch(void)
 		qsort(fuzzymatches, number_of_matches, sizeof(struct item *), compare_distance);
 		/* rebuild list of matches */
 		matches = matchend = NULL;
-		for (i = 0, item = fuzzymatches[0]; i < number_of_matches && item && \
-				item->text; item = fuzzymatches[i], i++)
-			appenditem(item, &matches, &matchend);
+		for (i = 0 ; i < number_of_matches ; i++){
+			appenditem(fuzzymatches[i], &matches, &matchend);
+        }
 
 		free(fuzzymatches);
 	}
