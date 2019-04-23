@@ -33,6 +33,8 @@ struct item {
 	struct item *left, *right;
 	int out;
 	int distance;
+	int length;
+	int textw;
 };
 
 static char text[BUFSIZ] = "";
@@ -72,6 +74,12 @@ appenditem(struct item *item, struct item **list, struct item **last)
 	*last = item;
 }
 
+int get_textw_len(struct item * it){
+	if (it->textw == 0){
+		it->textw = TEXTW(it->text);
+	}
+	return it->textw;
+}
 static void
 calcoffsets(void)
 {
@@ -83,10 +91,10 @@ calcoffsets(void)
 		n = mw - (promptw + inputw + TEXTW("<") + TEXTW(">"));
 	/* calculate which items will begin the next page and previous page */
 	for (i = 0, next = curr; next; next = next->right)
-		if ((i += (lines > 0) ? bh : MIN(TEXTW(next->text), n)) > n)
+		if ((i += (lines > 0) ? bh : MIN(get_textw_len(next), n)) > n)
 			break;
 	for (i = 0, prev = curr; prev && prev->left; prev = prev->left)
-		if ((i += (lines > 0) ? bh : MIN(TEXTW(prev->left->text), n)) > n)
+		if ((i += (lines > 0) ? bh : MIN(get_textw_len(prev->left), n)) > n)
 			break;
 }
 
@@ -97,11 +105,15 @@ max_textw(int max)
         max = 99999;
     }
 	int len = 0;
+	int max_text_len = 0;
     for (struct item *item = items; item && item->text; item++){
-		len = MAX(TEXTW(item->text), len);
-        if (len > max){
-            return max;
-        }
+		if (item->length > max_text_len){
+			len = MAX(get_textw_len(item), len);
+			if (len > max){
+				return max;
+			}
+			max_text_len = item->length;
+		}
     }
 	return len;
 }
@@ -184,7 +196,7 @@ drawmenu(void)
 		}
 		x += w;
 		for (item = curr; item != next; item = item->right)
-			x = drawitem(item, x, 0, MIN(TEXTW(item->text), mw - x - TEXTW(">")));
+			x = drawitem(item, x, 0, MIN(get_textw_len(item), mw - x - TEXTW(">")));
 		if (next) {
 			w = TEXTW(">");
 			drw_setscheme(drw, scheme[SchemeNorm]);
@@ -352,7 +364,7 @@ fuzzymatch(void)
 	/* walk through all items */
 	for (item = items; item && item->text; item++) {
 		if (text_len) {
-			itext_len = strlen(item->text);
+			itext_len = item->length;
 			pidx = 0;
 			sidx = eidx = -1;
 			/* walk through item text */
@@ -676,6 +688,7 @@ readstdin(void)
 		if (!(items[i].text = strdup(buf)))
 			die("cannot strdup %u bytes:", strlen(buf) + 1);
 		items[i].out = 0;
+		items[i].length = strlen(items[i].text);
 		drw_font_getexts(drw->fonts, buf, strlen(buf), &tmpmax, NULL);
 		if (tmpmax > inputw) {
 			inputw = tmpmax;
@@ -684,7 +697,7 @@ readstdin(void)
 	}
 	if (items)
 		items[i].text = NULL;
-	inputw = items ? TEXTW(items[imax].text) : 0;
+	inputw = items ? get_textw_len(items+imax) : 0;
 	lines = MIN(lines, i);
 }
 
@@ -752,6 +765,7 @@ setup(void)
 	bh = drw->fonts->h;
 	lines = MAX(lines, 0);
 	mh = (lines + 1) * bh;
+	promptw = (prompt && *prompt) ? TEXTW(prompt) - lrpad / 4 : 0;
 #ifdef XINERAMA
 	i = 0;
 	if (parentwin == root && (info = XineramaQueryScreens(dpy, &n))) {
@@ -778,9 +792,13 @@ setup(void)
 				if (INTERSECT(x, y, 1, 1, info[i]))
 					break;
 
-        promptw = (prompt && *prompt) ? TEXTW(prompt) - lrpad / 4 : 0;
-        int max_text = max_textw(info[i].x_org - promptw);
-		mw = MIN(MAX(max_text + promptw, 100), info[i].width);
+       
+	   	if (info[i].width < 100){
+			   mw = 100;
+		}else{
+			int max_text = max_textw(info[i].x_org - promptw);
+			mw = MIN(MAX(max_text + promptw, 100), info[i].width);
+		}
 		x = info[i].x_org + ((info[i].width  - mw) / 2);
 		y = info[i].y_org + ((info[i].height - mh) / 2);
 		XFree(info);
@@ -791,7 +809,6 @@ setup(void)
 			die("could not get embedding window attributes: 0x%lx",
 			    parentwin);
 
-        promptw = (prompt && *prompt) ? TEXTW(prompt) - lrpad / 4 : 0;
         int max_text = max_textw(info[i].x_org - promptw);
 		mw = MIN(MAX(max_text + promptw, 100), wa.width);
 		x = (wa.width  - mw) / 2;
