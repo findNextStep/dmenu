@@ -1,4 +1,7 @@
 *o
 dmenu
 stest
+.*
+!.gitignore
+compile_commands.json
 
