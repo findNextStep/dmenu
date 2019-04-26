@@ -747,7 +747,8 @@ setup(void)
 			   mw = 100;
 		}else{
 			int max_text = max_textw(info[i].x_org - promptw);
-			mw = MIN(MAX(max_text + promptw, 100), info[i].width);
+			/* mw = MIN(MAX(max_text + promptw, 100), info[i].width); */
+            mw = info[i].width / 2;
 		}
 		x = info[i].x_org + ((info[i].width  - mw) / 2);
 		y = info[i].y_org + ((info[i].height - mh) / 2);
