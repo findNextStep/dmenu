@@ -23,3 +23,5 @@ static unsigned int lines      = 11;
  * for example: " /?\"&[]"
  */
 static const char worddelimiters[] = " ";
+
+int has_sorted = 0;

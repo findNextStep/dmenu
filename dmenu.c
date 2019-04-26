@@ -293,7 +293,11 @@ int lev_cal(const char * text,const int text_len,const char *match_text,const in
         if (eidx == -1){
             return lev_cal(text,text_len,match_text,match_len,i_orig + 1);
         }
-        return min_int((eidx - i_orig) * 1000 + i_orig,lev_cal(text,text_len,match_text,match_len,i_orig + 1));
+        if (has_sorted){
+            return min_int((eidx - i_orig) * 1000 ,lev_cal(text,text_len,match_text,match_len,i_orig + 1));
+        }else{
+            return min_int((eidx - i_orig) * 1000 + i_orig,lev_cal(text,text_len,match_text,match_len,i_orig + 1));
+        }
     }
 }
 
@@ -817,6 +821,8 @@ main(int argc, char *argv[])
 			exit(0);
 		} else if (!strcmp(argv[i], "-b")) /* appears at the bottom of the screen */
 			topbar = 0;
+        else if (!strcmp(argv[i], "-format")) /* the input list has formatted */
+            has_sorted = 1;
 		else if (!strcmp(argv[i], "-f"))   /* grabs keyboard before reading stdin */
 			fast = 1;
 		else if (!strcmp(argv[i], "-i")) { /* case-insensitive item matching */
