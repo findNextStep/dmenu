@@ -16,3 +16,4 @@ add_executable(dmenu dmenu.c)
 target_link_libraries(dmenu dmenu_util Xinerama X11 fontconfig Xft)
 
 install(TARGETS dmenu)
+install(FILES dmenu_run DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
